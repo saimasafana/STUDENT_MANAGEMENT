@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5m$9$347525_6$e4u(^%ij*guiqa=oj)-x7scb$*s_&e+^4&v!'
-
+# SECRET_KEY = 'django-insecure-5m$9$347525_6$e4u(^%ij*guiqa=oj)-x7scb$*s_&e+^4&v!'
+SECRET_KEY=os.environ.get("SECRET_KEY","django.insecure-local-development key")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+# DEBUG = True
+DEBUG=os.environ.get("DEBUG","True")="True"
+ALLOWED_HOSTS = ["localhost","127.0.0.1",]
 
 
 # Application definition
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -76,12 +79,19 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get("DATABASEURL"):
+    DATABASES={
+        "default":dj_database_url.config(
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+                   }
 }
 
 
@@ -120,4 +130,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-CORS_ALLOW_ALL_ORIGINS=True
+STATIC_ROOT=BASE_DIR/"staticfiles"
+# CORS_ALLOW_ALL_ORIGINS=True
+CORS_ALLLOW_ALL_ORIGINS=["http://localhost:5173","http://127.0.0.1:5173"]
+render_host=os.environ.get("RENDE_EXTERNAL_HOSTNAME")
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
