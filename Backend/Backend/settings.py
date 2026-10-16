@@ -31,7 +31,7 @@ DEBUG = os.environ.get("DEBUG", "True") == "True"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "student-management-amae.onrender.com",
+    "https://student-management-bcjo.onrender.com",
 ]
 
 # Application definition
